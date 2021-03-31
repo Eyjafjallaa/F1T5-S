@@ -11,7 +11,7 @@ router.get('/sign_up',(req,res,next)=>{
     //multer 사용해서 잘 처리
 
     res.status(200).json({
-      "token":,
+      "token":test,
     });
   })
 })
