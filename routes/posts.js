@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 /* GET users listing. */
-routrouter.get('/posts', function(req, res, next) {
+router.get('/posts', function(req, res, next) {
   
 });
 
@@ -22,5 +22,4 @@ router.post('/posts/:postid/req', function(req, res, next) {
   res.send('respond with a resource');
 });
 
-
- router;
+module.exports = router;
