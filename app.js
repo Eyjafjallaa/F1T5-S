@@ -8,7 +8,7 @@ var indexRouter = require('./routes/index');
 var accountRouter = require('./routes/account');
 var postsRouter = require('./routes/posts');
 var profileRouter = require('./routes/profile');
-var sellerRouter = require('./routes/seller');
+var sellerRouter = require('./routes/');
 var app = express();
 
 // view engine setup
@@ -23,7 +23,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/account', accountRouter);
-app.use('/posts', postsRouter);
+app.use('/post', postsRouter);
 app.use('/profile', profileRouter);
 app.use('/seller',sellerRouter);
 
