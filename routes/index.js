@@ -24,18 +24,20 @@ router.get('/schoolinfo', function(req, res, next) {//학교검색하기
   res.status(200).json([
     {
       school_code:"대충학교코드",
-      school_name="대고소푸토웨아고등학교",
-      school_location="대구 구지 구지로 182",
+      school_name:"대고소푸토웨아고등학교",
+      school_location:"대구 구지 구지로 182",
     },
     {
       school_code:"대충학교코드2",
-      school_name="대고소푸토웨아고등학교2",
-      school_location="대구 구지 구지로 182+2",
+      school_name:"대고소푸토웨아고등학교2",
+      school_location:"대구 구지 구지로 182+2",
     },
     {
       school_code:"대충학교코드3",
-      school_name="대고소푸토웨아고등학교3",
-      school_location="대구 구지 구지로 182+3",
+      school_name:"대고소푸토웨아고등학교3",
+      school_location:"대구 구지 구지로 182+3",
     }
   ])
+});
+
 module.exports = router;
