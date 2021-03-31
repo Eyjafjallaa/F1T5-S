@@ -2,8 +2,8 @@ var express = require('express');
 var router = express.Router();
 
 /* GET users listing. */
-router.get('/posts', function(req, res, next) {
-  res.send('respond with a resource');
+routrouter.get('/posts', function(req, res, next) {
+  
 });
 
 router.post('/posts', function(req, res, next) {
@@ -23,5 +23,4 @@ router.post('/posts/:postid/req', function(req, res, next) {
 });
 
 
-
-module.exports = router;
+ router;
