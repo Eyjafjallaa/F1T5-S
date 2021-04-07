@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+const upload = require('../middleware/fileload');
 
 /* GET users listing. */
 router.get('/posts', function(req, res, next) {
@@ -17,7 +18,8 @@ router.get('/posts', function(req, res, next) {
   });
 });
 
-router.post('/posts', function(req, res, next) {
+router.post('/posts',upload.array(), function(req, res, next) {
+
   res.status(200).json({});
 });
 

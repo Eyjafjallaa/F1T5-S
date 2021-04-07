@@ -13,7 +13,7 @@ router.post('/sign_up', (req, res, next) => {
     db.query(`INSERT INTO user (userid,name,password,nickname,email,schoolname,contact,enteryear) VALUES(?,?,?,?,?,?,?,?)`,
     [post.userid, post.name, pw, post.nickname, post.email, post.schoolname, post.contact, post.enteryear], 
     (err, result) => {
-      console.log(err);
+      // console.log(err);
       var user = { 
         sub: post.userid,
         name:post.nickname,
