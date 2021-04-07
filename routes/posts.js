@@ -3,7 +3,7 @@ var router = express.Router();
 const upload = require('../middleware/fileload');
 
 /* GET users listing. */
-router.get('/posts', function(req, res, next) {
+router.get('/posts',upload.array(), function(req, res, next) {
   res.status(200).json({
     id : "1",
     title : "제목",
@@ -18,10 +18,6 @@ router.get('/posts', function(req, res, next) {
   });
 });
 
-router.post('/posts',upload.array(), function(req, res, next) {
-
-  res.status(200).json({});
-});
 
 router.get('/posts/:postid', function(req, res, next) {
   res.status(200).json([
