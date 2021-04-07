@@ -4,7 +4,7 @@ const fs = require('fs');
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const roomId = req.params.roomId;
-        const path = '../pulbic/images/' + roomId;
+        const path = '../images/' + roomId;
         try {
             if (!fs.existsSync(path)) {
                 fs.mkdirSync(path);
