@@ -4,7 +4,7 @@ const db = require("../model/db");
 const jwt = require('jsonwebtoken');
 const secret = require('../secret/primary');
 const crypto = require('crypto');
-const { post } = require('../app');
+
 
 
 router.post('/sign_up', (req, res, next) => {
@@ -34,17 +34,15 @@ router.post('/login', (req, res) => {
 
 router.post('/sign_up/check', (req, res) => {
   post=req.body;
-  console.log(post);
   db.query('SELECT userid FROM user',(err,result)=>{
     for(var i=0;i<result.length;i++){
       if(result[i].userid==post.userid){
         res.status(200).json({
           result:"fail",
         });
-        console.log(a);
+        return;
       }
     }
-    console.log(b)
     res.status(200).json({
       result:"success",
     });
