@@ -11,7 +11,7 @@ router.get('/seller/:userid', function(req, res, next) {
 
 router.get('/seller/:userid/selling', function(req, res, next) {
   res.status(200).json([
-   {
+  {
     id : "1",
     title : "post 제목",
     tag : "#태그",
