@@ -3,7 +3,7 @@ var router = express.Router();
 
 /* GET users listing. */
 
-router.get('/:postid', function(req, res, next) {//조회
+router.get('/:userid', function(req, res, next) {//조회
     res.status(200).json({
         school_name:"대구소프트웨어마이스터고등학고",
         name:"강석형",
@@ -14,7 +14,7 @@ router.get('/:postid', function(req, res, next) {//조회
     });
 });
 
-router.put('/:postid', function(req, res, next) {//수정
+router.put('/:userid', function(req, res, next) {//수정
     res.status(200).json({
         school_name:"대구소프트웨어마이스터고등학고",
         name:"강석형",
