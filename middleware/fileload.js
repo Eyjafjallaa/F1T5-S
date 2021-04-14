@@ -3,8 +3,7 @@ const fs = require('fs');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const roomId = req.params.roomId;
-        const path = '../images/' + roomId;
+        const path = 'images/'+req.originalUrl.split('/')[1];
         try {
             if (!fs.existsSync(path)) {
                 fs.mkdirSync(path);
