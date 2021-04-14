@@ -22,6 +22,7 @@ router.get('/', upload.array(), function (req, res, next) {
 
 router.post('/', upload.array('attachment'), function (req, res, next) {
   var post = req.body;
+  
   const querypost = (result) => {
     const promise = new Promise((resolve, reject) => {
       db.beginTransaction();
@@ -36,7 +37,7 @@ router.post('/', upload.array('attachment'), function (req, res, next) {
 
   const picturequery=(result)=>{
     const promise=new Promise((resolve,reject)=>{
-      for(var i=0;i<req.files.length;i++){
+      for(let i=0;i<req.files.length;i++){
         db.query('INSERT INTO attachment (url,postid,originalname) VALUES(?,?,?)',
         ["images/posts/"+req.files[i].filename,result.insertId,req.files[i].originalname],(err,result)=>{
           if(err)reject(err);
@@ -53,7 +54,6 @@ router.post('/', upload.array('attachment'), function (req, res, next) {
   }
 
   const error=(error)=>{
-    console.log(error);
     db.rollback();
     res.status(500).json({error:error});
   }
