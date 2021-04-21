@@ -11,23 +11,6 @@ var postsRouter = require('./routes/posts');
 var profileRouter = require('./routes/profile');
 var sellerRouter = require('./routes/');
 
-/*
-var storage = multer.diskStorage({
-  destination: function(req,file,callback){
-    callback(null,'uploads');
-  },
-  filename: function(req,file,callback){
-    callback(null,file.originalname+Date.now)
-  }
-});
-var upload = multer({
-  storage: storage,
-  limits:{
-    files: 10,
-    fileSize: 1024*1024*1024,
-  }
-});
-*/
 var app = express();
 
 // view engine setup
@@ -38,14 +21,13 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images',express.static(path.join(__dirname, 'images')));
 app.use(cors());
-//app.use(multer());
 
 
 app.use('/', indexRouter);
 app.use('/account', accountRouter);
-app.use('/post', postsRouter);
+app.use('/posts', postsRouter);
 app.use('/profile', profileRouter);
 app.use('/seller',sellerRouter);
 
