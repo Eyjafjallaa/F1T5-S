@@ -9,9 +9,17 @@ router.get('/:userid', function(req, res, next) {//조회
     const userid = req.params.userid;
     db.query('select schoolname, name, nickname, contact, enteryear, profilepicture, email from user where userid = ?', [userid], (err, result) => {
         //객체
-        console.log(result[0]);
-        console.log(result[0].schoolname);
-        res.status(200).json({});
+        if(result[0]==undefined){
+            res.status(401).json();
+            return;
+        }
+        try{
+            result = result[0];
+            res.status(200).json(result);
+        }catch(err){
+            console.log(err);
+            res.status(400).json();
+        }
     })
 });
 
