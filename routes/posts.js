@@ -69,7 +69,11 @@ router.get('/:postid', function (req, res, next) {
   postid = req.params.postid;
   db.query(`SELECT post.postid, post.title tag, post.userid, post.price, post.timestamp, attachment.url, attachment.postid FROM post
     inner join attachment on post.postid = attachment.postid where post.postid = ?;`, [postid], (err, result) => {
-    if(err){
+      if (result[0] == undefined) {
+        res.status(401).json();
+        return;
+      }
+      if(err){
       res.status(400).json;
       return;
     }
