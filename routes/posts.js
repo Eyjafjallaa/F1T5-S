@@ -26,7 +26,7 @@ router.post('/', upload.array('attachment'), function (req, res, next) {
   const querypost = (result) => {
     const promise = new Promise((resolve, reject) => {
       db.beginTransaction();
-      db.query('INSERT INTO post (title,tag,userid,step,price,content) VALUES(?,?,?,?,?,?) ',
+      db.query('INSERT INTO post (title,tag,userid,step,price,content,timestamp) VALUES(?,?,?,?,?,?,NOW()) ',
         [post.title, post.tag, post.userid, 0 ,post.price, post.content], (err, result) => {
           if(err)reject(err);
           else resolve(result);
