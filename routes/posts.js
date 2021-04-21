@@ -64,34 +64,32 @@ router.post('/', upload.array('attachment'), function (req, res, next) {
 })
 
 
-router.get('/posts/:postid', function (req, res, next) {
-  res.status(200).json([
-    {
-      id: "1",
-      title: "제목",
-      tag: "#태그1 #태그2",
-      userid: "userid",
-      nickname: "nickname",
-      price: "3000",
-      timestamp: "2021-03-31 17:30:36"
-    },
-    {
-      id: "2",
-      title: "제목2",
-      tag: "#태그1 #태그2",
-      userid: "userid2",
-      nickname: "nickname2",
-      price: "4000",
-      timestamp: "2021-03-31 17:30:37"
+router.get('/:postid', function (req, res, next) {
+  //게시글 조회
+  postid = req.params.postid;
+  db.query(`SELECT post.postid, post.title tag, post.userid, post.price, post.timestamp, attachment.url, attachment.postid FROM post
+    inner join attachment on post.postid = attachment.postid where post.postid = 27;`, [postid], (err, result) => {
+    let url = [];
+
+    for (let i in(result)){
+      url.push(result[i].url);
     }
-  ]);
+    console.log(typeof(url));
+    delete result[0].url;
+    //url 삭제
+    result[0].url = url;
+    result = result[0];
+    // this.result = result[0]
+    // console.log(this.result);
+    res.status(200).json(result);
+  })
 });
 
-router.put('/posts/:postid', function (req, res, next) {
+router.put('/:postid', function (req, res, next) {
   res.status(200).json({});
 });
 
-router.post('/posts/:postid/req', function (req, res, next) {
+router.post('/:postid/req', function (req, res, next) {
   res.status(200).json({});
 });
 
