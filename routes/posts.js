@@ -68,13 +68,15 @@ router.get('/:postid', function (req, res, next) {
   //게시글 조회
   postid = req.params.postid;
   db.query(`SELECT post.postid, post.title tag, post.userid, post.price, post.timestamp, attachment.url, attachment.postid FROM post
-    inner join attachment on post.postid = attachment.postid where post.postid = 27;`, [postid], (err, result) => {
+    inner join attachment on post.postid = attachment.postid where post.postid = ?;`, [postid], (err, result) => {
+    if(err){
+      res.status(400).json;
+      return;
+    }
     let url = [];
-
     for (let i in(result)){
       url.push(result[i].url);
     }
-    console.log(typeof(url));
     delete result[0].url;
     //url 삭제
     result[0].url = url;
