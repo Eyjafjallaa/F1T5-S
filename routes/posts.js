@@ -4,10 +4,15 @@ const db = require('../model/db');
 const upload = require('../middleware/fileload');
 
 /* GET users listing. */
-router.get('/', function (req, res, next) {//sort 하는 방법 추가해야함
+router.get('/:start/:count/:sort', function (req, res, next) {//sort 하는 방법 추가해야함
   const search_post = () => {
     const promise = new Promise((resolve, reject) => {
-      db.query('SELECT postid,title,tag,post.userid,price,timestamp FROM post LEFT JOIN user ON post.userid=user.userid', (err, result) => {
+      var c=db.query(`SELECT post.postid,post.title,post.tag,post.userid,post.price,post.timestamp,user.nickname,
+      group_concat(attachment.url ORDER by attachment.attachmentid) AS URL
+      FROM post LEFT JOIN user ON post.userid=user.userid
+      LEFT JOIN attachment on attachment.postid=post.postid
+      GROUP BY post.postid
+      LIMIT ?,?`,[parseInt(req.params.start),parseInt(req.params.count)],(err, result) => {
         if (err) reject(err);
         else {
           var arr_result = [];
@@ -17,10 +22,10 @@ router.get('/', function (req, res, next) {//sort 하는 방법 추가해야함
               title: result[i].title,
               tag: result[i].tag,
               userid: result[i].userid,
-              nickname: "",
+              nickname: result[i].nickname,
               price: result[i].price,
               timestamp: result[i].timestamp,
-              attachment: [],
+              attachment: result[i].URL,
             });
           }
           resolve(arr_result);
@@ -28,25 +33,18 @@ router.get('/', function (req, res, next) {//sort 하는 방법 추가해야함
       })
     })
     return promise;
-
-    
   }
 
-  const search_Url = (result) => {
+  const substr_URL = (result) => {
     const promise = new Promise((resolve, reject) => {
-      //console.log(result);
+      var arr_result = [];
       for (var i = 0; i < result.length; i++) {
-        console.log(result[i]);
-        db.query('SELECT url FROM attachment WHERE postid=?', [result[i].postid], (err, data) => {
-          if (err) reject(err);
-          if (data[0] != undefined) {
-            result[i].attachment=data;
-          }else{
-            result[i].attachment=null;
-          }
-        })
-        resolve(result);
+        if(result[i].attachment==undefined)continue;
+        const a=result[i].attachment.split(',');
+        console.log(a);
+        result[i].attachment=a;
       }
+      resolve(result);
     })
     return promise;
   }
@@ -60,7 +58,7 @@ router.get('/', function (req, res, next) {//sort 하는 방법 추가해야함
   }
 
   search_post()
-    .then(search_Url)
+    .then(substr_URL)
     .then(respond)
     .catch(error);
 });
