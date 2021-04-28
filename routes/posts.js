@@ -138,7 +138,8 @@ router.get('/:postid', function (req, res, next) {
   })
 });
 
-router.put('/:postid', function (req, res, next) {
+router.put('/:postid', upload.array('attachment'), function (req, res, next) { //수정
+  console.log(req.files); //url 저장은 path로 저장한다,
   res.status(200).json({});
 });
 
