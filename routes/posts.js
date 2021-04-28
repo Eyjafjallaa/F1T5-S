@@ -2,8 +2,6 @@ var express = require('express');
 var router = express.Router();
 const db = require('../model/db');
 const upload = require('../middleware/fileload');
-const { response } = require('express');
-const { array } = require('../middleware/fileload');
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {//sort 하는 방법 추가해야함
@@ -30,6 +28,8 @@ router.get('/', function (req, res, next) {//sort 하는 방법 추가해야함
       })
     })
     return promise;
+
+    
   }
 
   const search_Url = (result) => {
