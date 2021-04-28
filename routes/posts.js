@@ -113,7 +113,7 @@ router.post('/', upload.array('attachment'), function (req, res, next) {
 router.get('/:postid', function (req, res, next) {
   //게시글 조회
   postid = req.params.postid;
-  db.query(`SELECT post.postid, post.title tag, post.userid, post.price, post.timestamp, attachment.url, attachment.postid FROM post
+  db.query(`SELECT post.postid, post.title tag, post.userid, post.price, post.timestamp, attachment.url, attachment.attachmentid FROM post
     inner join attachment on post.postid = attachment.postid where post.postid = ?;`, [postid], (err, result) => {
       if (result[0] == undefined) {
         res.status(401).json();
@@ -123,17 +123,18 @@ router.get('/:postid', function (req, res, next) {
       res.status(400).json;
       return;
     }
-    let url = [];
-    for (let i in (result)) {
-      url.push(result[i].url);
+    //console.log(result)
+    let attachment = []; //새로운 배열
+    for (let i in (result)) { // 배열에 url, id 객체를 추가
+      attachment.push({url : result[i].url,
+      attachmentid : result[i].attachmentid});
     }
+    console.log(attachment);
     delete result[0].url;
-    //url 삭제
-    result[0].url = url;
-    result = result[0];
-    // this.result = result[0]
-    // console.log(this.result);
-    res.status(200).json(result);
+    delete result[0].attachmentid;
+
+    result[0].attachment = attachment;
+    res.status(200).json(result[0]);
   })
 });
 
