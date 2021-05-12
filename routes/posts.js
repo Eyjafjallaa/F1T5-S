@@ -165,9 +165,46 @@ router.get('/:postid', function (req, res, next) {
 });
 
 router.put('/:postid', upload.array('attachment'), function (req, res, next) { //수정
-  console.log(req.files); //url 저장은 path로 저장한다,
-  res.status(200).json({});
+  console.log(req.files); //url 저장은 path로 저장한다.
+  
+  const updatequery = (result) => {
+    const promise = new Promise((resolve, reject) => {
+        db.query('UPDATE post [title = ?, tag = ?, price = ?, content = ?] WHERE postid = ?',
+        [req.body.title, req.body.tag, req.body.price, req.params], (err, result) => {
+          if (err) reject(err);
+        })
+      resolve(result);
+    })
+    return promise;
+  }
+
+  const deletequery = (result) => {
+    const promise = new Promise((resolve, reject) => {
+      for (let i = 0; i < req.files.length; i++) {
+        db.query('DELETE FROM attachment WHERE url = ?',
+        [attach], (err, result) => {
+          if (err) reject(err);
+        })
+      }
+      resolve(result);
+    })
+    return promise;
+  }
+  const respond = (result) => {//json resposne;
+    db.commit();
+    res.status(200).json({});
+  }
+
+  const error = (error) => {
+    db.rollback();
+    res.status(500).json({ error: error });
+  }
+  updatequery()
+    .then(deletequery)
+    .then(respond)
+    .catch(error)
 });
+
 
 router.post('/:postid/req', function (req, res, next) {
   res.status(200).json({});
