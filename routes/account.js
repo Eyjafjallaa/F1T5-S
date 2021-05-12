@@ -74,7 +74,7 @@ router.post('/sign_up/check', (req, res) => {
 })
 
 router.post('/autologin', (req, res) => {
-  const token = req.get('Authorization');
+  const token = req.get('authorization');
   const tokendecode = () => {
     const promise = new Promise((resolve, reject) => {
       jwt.verify(token, secret, (err, data) => {

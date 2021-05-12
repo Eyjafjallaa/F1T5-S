@@ -9,7 +9,7 @@ var indexRouter = require('./routes/index');
 var accountRouter = require('./routes/account');
 var postsRouter = require('./routes/posts');
 var profileRouter = require('./routes/profile');
-var sellerRouter = require('./routes/');
+var sellerRouter = require('./routes/seller');
 
 var app = express();
 
