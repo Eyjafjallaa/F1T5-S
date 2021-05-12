@@ -23,7 +23,7 @@ router.get('/:userid', function(req, res, next) {//조회
     })
 });
 
-router.put('/:userid',upload.single('z') ,function(req, res, next) {//수정
+router.put('/:userid',upload.single('attachment') ,function(req, res, next) {//수정
     const URL = "images/profile/"+req.file.filename;
 
     const updatePhoto = ()=>{
