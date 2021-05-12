@@ -4,15 +4,43 @@ const db = require('../model/db');
 const upload = require('../middleware/fileload');
 
 /* GET users listing. */
-router.get('/:start/:count/:sort', function (req, res, next) {//sort 하는 방법 추가해야함
+router.get('/', function (req, res, next) {//sort 하는 방법 추가해야함
+  const sorting=()=>{
+    var c="";
+    switch(req.query.sort){
+      case "1":
+        c+="timestamp DESC";
+        break;
+      case "2":
+        c+="timestamp ASC";
+        break;
+      case "3":
+        c+="price DESC";
+        break;
+      case "4":
+        c+="price ASC";
+        break;
+      default:
+        c+="timestamp DESC";
+        break;
+    }
+    return c;
+  }
   const search_post = () => {
     const promise = new Promise((resolve, reject) => {
-      var c=db.query(`SELECT post.postid,post.title,post.tag,post.userid,post.price,post.timestamp,user.nickname,
+      var start,count;
+      if(req.query.start==null) start=0;
+      else start=parseInt(req.query.start);
+      
+      if(req.query.count==null) count=10;
+      else count = parseInt(req.query.count);
+      
+      db.query(`SELECT post.postid,post.title,post.tag,post.userid,post.price,post.timestamp,user.nickname,
       group_concat(attachment.url ORDER by attachment.attachmentid) AS URL
       FROM post LEFT JOIN user ON post.userid=user.userid
       LEFT JOIN attachment on attachment.postid=post.postid
-      GROUP BY post.postid
-      LIMIT ?,?`,[parseInt(req.params.start),parseInt(req.params.count)],(err, result) => {
+      GROUP BY post.postid order by ?
+      LIMIT ?,?`,[sorting(), start,count],(err, result) => {
         if (err) reject(err);
         else {
           var arr_result = [];
