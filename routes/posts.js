@@ -69,7 +69,6 @@ router.get('/', function (req, res, next) {//sort 하는 방법 추가해야함
       for (var i = 0; i < result.length; i++) {
         if(result[i].attachment==undefined)continue;
         const a=result[i].attachment.split(',');
-        console.log(a);
         result[i].attachment=a;
       }
       resolve(result);
@@ -155,7 +154,6 @@ router.get('/:postid', function (req, res, next) {
       attachment.push({url : result[i].url,
       attachmentid : result[i].attachmentid});
     }
-    console.log(attachment);
     delete result[0].url;
     delete result[0].attachmentid;
 
@@ -165,7 +163,7 @@ router.get('/:postid', function (req, res, next) {
 });
 
 router.put('/:postid', upload.array('attachment'), function (req, res, next) { //수정
-  console.log(req.files); //url 저장은 path로 저장한다.
+   //url 저장은 path로 저장한다.
   
   const updatequery = (result) => {
     const promise = new Promise((resolve, reject) => {

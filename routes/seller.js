@@ -61,7 +61,6 @@ router.get('/:userid/products', function (req, res, next) {
       for (var i = 0; i < result.length; i++) {
         if(result[i].attachment==undefined)continue;
         const a=result[i].attachment.split(',');
-        console.log(a);
         result[i].attachment=a;
       }
       resolve(result);
