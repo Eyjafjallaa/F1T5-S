@@ -3,6 +3,7 @@ var router = express.Router();
 let request = require('request');
 let cheerio = require('cheerio');
 const { data } = require('cheerio/lib/api/attributes');
+const db=require('../model/db');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -10,6 +11,29 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/search', function(req, res, next) {
+  var word= req.params.keyword
+  var start,count;
+      if(req.query.start==null) start=0;
+      else start=parseInt(req.query.start);
+      
+      if(req.query.count==null) count=10;
+      else count = parseInt(req.query.count);
+      
+  if(word[0]=='#'){//#검색
+    word.split('#');
+  }
+  else{//문장 검색
+    db.query(`SELECT post.postid,post.title,post.tag,post.userid,post.price,post.timestamp,user.nickname,
+    group_concat(attachment.url ORDER by attachment.attachmentid) AS URL
+    FROM post LEFT JOIN user ON post.userid=user.userid
+    LEFT JOIN attachment on attachment.postid=post.postid
+    WHERE post.title like ? OR post.content like ?
+    GROUP BY post.postid order by ?
+    LIMIT ?,?`,[word,sorting(),start,count],(err,result)=>{
+
+    })
+  }
+
   res.status(200).json([
     {
       post:"1234",
