@@ -111,24 +111,28 @@ router.get('/schoolinfo', function(req, res, next) {//학교검색하기
       return res.status(400).json({err});
     }
     let jsonbody = JSON.parse(body); //json으로 파싱
-    
+    if(jsonbody.schoolInfo == undefined){
+      res.status(200).json({});
+      return;
+    }
     let school = jsonbody.schoolInfo[1]
     let result = [];
     for(let i = 0; school.row[i] != undefined; i++){
         if('초등학교' === school.row[i].SCHUL_KND_SC_NM){
           continue;
         }
-        let school_code = school.row[i].SD_SCHUL_CODE;   //학교 코드
-        let school_name = school.row[i].SCHUL_NM;     //학교이름
-        let school_location = school.row[i].LCTN_SC_NM; //학교 위치
-        
-        result[i] = {
-          "school_code" : school_code,
-          "school_name" : school_name,
-          "school_lacation" : school_location
-      }
+        let schoolcode = school.row[i].SD_SCHUL_CODE;   //학교 코드
+        let schoolname = school.row[i].SCHUL_NM;     //학교이름
+        let schoollocation = school.row[i].LCTN_SC_NM; //학교 위치
+
+        let tmp = new Object();
+        tmp.school_code = schoolcode;
+        tmp.school_name = schoolname;
+        tmp.school_location = schoollocation;
+
+        result.push(tmp);
     }
-    res.status(200).json({result});
+    res.status(200).json(result);
   });
 });
 
