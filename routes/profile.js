@@ -25,20 +25,31 @@ router.get('/:userid', function(req, res, next) {//조회
 
 router.put('/:userid',upload.single('attachment') ,function(req, res, next) {//수정
     const URL = "images/profile/"+req.file.filename;
+    
+    const token = req.body.token;
+    const tokendecode = () => {
+        const promise = new Promise((resolve, reject) => {
+            jwt.verify(token, secret, (err, data) => {
+                if (err) reject(err);
+                else resolve(data);
+            })
+        })
+        return promise;
+    }
 
-    const updatePhoto = ()=>{
+    const updatePhoto = (data)=>{
         const promise = new Promise((resolve, reject)=>{
-            db.query('UPDATE user SET profilepicture =? WHERE userid = ?',[URL,req.params.userid], (err, result)=>{
+            db.query('UPDATE user SET profilepicture =? WHERE userid = ?',[URL,data.sub], (err, result)=>{
                 if(err) reject(err)
-                resolve(result)
+                resolve(data);
             });
         })
         return promise
     }
 
-    const queryUser = (result)=>{
+    const queryUser = (data)=>{
         const promise = new Promise((resolve, reject)=>{
-            db.query('SELECT schoolname,name,nickname,contact,enteryear,profilepicture,email FROM user WHERE userid=?',[req.params.userid],(err,result)=>{
+            db.query('SELECT schoolname,name,nickname,contact,enteryear,profilepicture,email FROM user WHERE userid=?',[data.sub],(err,result)=>{
                 if(err) reject(err)
                 else resolve(result)
             })
@@ -61,8 +72,8 @@ router.put('/:userid',upload.single('attachment') ,function(req, res, next) {//�
     const error=(error)=>{
         res.status(500).json({error:error})
     }
-
-    updatePhoto()
+    tokendecode()
+    .then(updatePhoto)
     .then(queryUser)
     .then(respond)
     .catch(error)

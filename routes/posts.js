@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 const db = require('../model/db');
 const upload = require('../middleware/fileload');
+const secret = require('../secret/primary');
+const jwt = require('jsonwebtoken');
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {//sort 하는 방법 추가해야함
@@ -93,12 +95,22 @@ router.get('/', function (req, res, next) {//sort 하는 방법 추가해야함
 
 router.post('/', upload.array('attachment'), function (req, res, next) {
   var post = req.body;
-
-  const querypost = (result) => {
+  const token = req.body.token;
+  const tokendecode = () => {
+    const promise = new Promise((resolve, reject) => {
+      jwt.verify(token, secret, (err, data) => {
+        if (err) reject(err);
+        else resolve(data);
+      })
+    })
+    return promise;
+  }
+  const querypost = (data) => {
+    var userid=data.sub;
     const promise = new Promise((resolve, reject) => {
       db.beginTransaction();
       db.query('INSERT INTO post (title,tag,userid,step,price,content,timestamp) VALUES(?,?,?,?,?,?,NOW()) ',
-        [post.title, post.tag+'#', post.userid, 0, post.price, post.content], (err, result) => {
+        [post.title, post.tag+'#', userid, 0, post.price, post.content], (err, result) => {
           if (err) reject(err);
           else resolve(result);
         })
@@ -128,10 +140,12 @@ router.post('/', upload.array('attachment'), function (req, res, next) {
     db.rollback();
     res.status(500).json({ error: error });
   }
-  querypost()
-    .then(picturequery)
-    .then(respond)
-    .catch(error)
+  
+  tokendecode()
+  .then(querypost)
+  .then(picturequery)
+  .then(respond)
+  .catch(error)
 })
 
 
