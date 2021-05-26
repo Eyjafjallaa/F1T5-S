@@ -9,7 +9,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/search', function(req, res, next) {
-  var word= '%'+req.query.keyword+'%';
+  var word= req.query.keyword;
   var start,count;
   if(req.query.start==null) start=0;
   else start=parseInt(req.query.start);
@@ -40,12 +40,53 @@ router.get('/search', function(req, res, next) {
   }
   const search_post=()=>{
     const promise = new Promise((resolve,reject)=>{
-      if(word[0]=='#'){//#검색
-        word.split('#');
-        
+      if(word[0]==='#'){//#검색
+        word=word.split('#');
+        word.splice(0,1);
+        word.push(sorting());
+        word.push(start);
+        word.push(count);
+        for(var i=0;i<word.length-3;i++){
+          word[i]="%#"+word[i]+"#%";
+        }
+        var query=`
+        SELECT post.postid,post.title,post.tag,post.userid,post.price,post.timestamp,user.nickname,
+        group_concat(attachment.url ORDER by attachment.attachmentid)AS USR 
+        FROM post LEFT JOIN user ON post.userid=user.userid
+        LEFT JOIN attachment on attachment.postid=post.postid
+        WHERE `;
+        for(var i=0;i<word.length-3;i++){
+          query +="tag like ? ";
+          if(i!=word.length-4){
+            query+="AND ";
+          }
+        };
+        query+='GROUP BY post.postid order by ? LIMIT ?,?';
+        console.log(query);
+        var c=db.query(query,word,(err,result)=>{
+          if(err) reject(err);
+          else{
+            var arr_result=[];
+            for(var i=0;i<result.length;i++){
+              arr_result.push({
+                postid: result[i].postid,
+                title: result[i].title,
+                tag: result[i].tag,
+                userid: result[i].userid,
+                nickname: result[i].nickname,
+                price: result[i].price,
+                timestamp: result[i].timestamp,
+                attachment: result[i].URL,
+              })
+            }
+            resolve(arr_result);
+          }
+          console.log(c.sql);
+        })
       }
       else{//문장 검색
-        db.query(`SELECT post.postid,post.title,post.tag,post.userid,post.price,post.timestamp,user.nickname,
+        word='%'+word+'%';
+        var c=db.query(`SELECT post.postid,post.title,post.tag,post.userid,post.price,post.timestamp,user.nickname,
         group_concat(attachment.url ORDER by attachment.attachmentid) AS URL
         FROM post LEFT JOIN user ON post.userid=user.userid
         LEFT JOIN attachment on attachment.postid=post.postid
@@ -69,6 +110,7 @@ router.get('/search', function(req, res, next) {
             }
             resolve(arr_result);
           }
+          console.log(c.sql);
         })
       }
     })
