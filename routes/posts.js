@@ -98,7 +98,7 @@ router.post('/', upload.array('attachment'), function (req, res, next) {
     const promise = new Promise((resolve, reject) => {
       db.beginTransaction();
       db.query('INSERT INTO post (title,tag,userid,step,price,content,timestamp) VALUES(?,?,?,?,?,?,NOW()) ',
-        [post.title, post.tag, post.userid, 0, post.price, post.content], (err, result) => {
+        [post.title, post.tag+'#', post.userid, 0, post.price, post.content], (err, result) => {
           if (err) reject(err);
           else resolve(result);
         })
@@ -147,7 +147,7 @@ router.get('/:postid', function (req, res, next) {
       if (err) {
       res.status(400).json;
       return;
-    }
+      }
     //console.log(result)
     let attachment = []; //새로운 배열
     for (let i in (result)) { // 배열에 url, id 객체를 추가
