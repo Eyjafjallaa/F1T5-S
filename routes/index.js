@@ -9,40 +9,98 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/search', function(req, res, next) {
-  var word= req.params.keyword
+  var word= '%'+req.query.keyword+'%';
   var start,count;
-      if(req.query.start==null) start=0;
-      else start=parseInt(req.query.start);
-      
-      if(req.query.count==null) count=10;
-      else count = parseInt(req.query.count);
-      
-  if(word[0]=='#'){//#검색
-    word.split('#');
-  }
-  else{//문장 검색
-    db.query(`SELECT post.postid,post.title,post.tag,post.userid,post.price,post.timestamp,user.nickname,
-    group_concat(attachment.url ORDER by attachment.attachmentid) AS URL
-    FROM post LEFT JOIN user ON post.userid=user.userid
-    LEFT JOIN attachment on attachment.postid=post.postid
-    WHERE post.title like ? OR post.content like ?
-    GROUP BY post.postid order by ?
-    LIMIT ?,?`,[word,sorting(),start,count],(err,result)=>{
-
-    })
-  }
-
-  res.status(200).json([
-    {
-      post:"1234",
-      title:"이물건팝니다",
-      tag:"태그1 태그2 태그3 태그5",
-      userid:"kseocken",
-      price:"30230300",
-      timestamp:"2020-04-04-11-23-60",
-      attachment:["url1","url2","url3","url4"]
+  if(req.query.start==null) start=0;
+  else start=parseInt(req.query.start);
+  
+  if(req.query.count==null) count=10;
+  else count = parseInt(req.query.count);
+  
+  const sorting=()=>{
+    var c="";
+    switch(req.query.sort){
+      case "1":
+        c+="timestamp DESC";
+        break;
+      case "2":
+        c+="timestamp ASC";
+        break;
+      case "3":
+        c+="price DESC";
+        break;
+      case "4":
+        c+="price ASC";
+        break;
+      default:
+        c+="timestamp DESC";
+        break;
     }
-  ])
+    return c;
+  }
+  const search_post=()=>{
+    const promise = new Promise((resolve,reject)=>{
+      if(word[0]=='#'){//#검색
+        word.split('#');
+        
+      }
+      else{//문장 검색
+        db.query(`SELECT post.postid,post.title,post.tag,post.userid,post.price,post.timestamp,user.nickname,
+        group_concat(attachment.url ORDER by attachment.attachmentid) AS URL
+        FROM post LEFT JOIN user ON post.userid=user.userid
+        LEFT JOIN attachment on attachment.postid=post.postid
+        WHERE post.title like ? OR post.content like ?
+        GROUP BY post.postid order by ?
+        LIMIT ?,?`,[word,word,sorting(),start,count],(err,result)=>{
+          if(err) reject(err);
+          else{
+            var arr_result=[];
+            for(var i=0;i<result.length;i++){
+              arr_result.push({
+                postid: result[i].postid,
+                title: result[i].title,
+                tag: result[i].tag,
+                userid: result[i].userid,
+                nickname: result[i].nickname,
+                price: result[i].price,
+                timestamp: result[i].timestamp,
+                attachment: result[i].URL,
+              })
+            }
+            resolve(arr_result);
+          }
+        })
+      }
+    })
+    return promise;
+  }
+  
+  const substr_URL = (result) => {
+    const promise = new Promise((resolve, reject) => {
+      var arr_result = [];
+      for (var i = 0; i < result.length; i++) {
+        if(result[i].attachment==undefined)continue;
+        const a=result[i].attachment.split(',');
+        result[i].attachment=a;
+      }
+      resolve(result);
+    })
+    return promise;
+  }
+
+  const respond = (result) => {
+    res.status(200).json(result);
+  }
+
+  const error = (error) => {
+    res.status(500).json({ error: error });
+  }
+
+  search_post()
+  .then(substr_URL)
+  .then(respond)
+  .catch(error);
+  
 });
 
 router.get('/schoolinfo', function(req, res, next) {//학교검색하기
@@ -65,7 +123,7 @@ router.get('/schoolinfo', function(req, res, next) {//학교검색하기
           "school_code" : school_code,
           "school_name" : school_name,
           "school_lacation" : school_location
-       }
+      }
     }
     res.status(200).json({result});
   });
