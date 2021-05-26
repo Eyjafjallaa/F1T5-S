@@ -137,7 +137,7 @@ router.post('/', upload.array('attachment'), function (req, res, next) {
 
 router.get('/:postid', function (req, res, next) {
   //게시글 조회
-  postid = req.params.postid;
+  var postid = req.params.postid;
   db.query(`SELECT post.postid, post.title tag, post.userid, post.price, post.timestamp, attachment.url, attachment.attachmentid FROM post
     inner join attachment on post.postid = attachment.postid where post.postid = ?;`, [postid], (err, result) => {
       if (result[0] == undefined) {
