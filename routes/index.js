@@ -62,7 +62,6 @@ router.get('/search', function(req, res, next) {
           }
         };
         query+='GROUP BY post.postid order by ? LIMIT ?,?';
-        console.log(query);
         var c=db.query(query,word,(err,result)=>{
           if(err) reject(err);
           else{
@@ -81,7 +80,6 @@ router.get('/search', function(req, res, next) {
             }
             resolve(arr_result);
           }
-          console.log(c.sql);
         })
       }
       else{//문장 검색
@@ -110,7 +108,6 @@ router.get('/search', function(req, res, next) {
             }
             resolve(arr_result);
           }
-          console.log(c.sql);
         })
       }
     })
