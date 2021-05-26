@@ -112,13 +112,16 @@ router.get('/schoolinfo', function(req, res, next) {//학교검색하기
     }
     let jsonbody = JSON.parse(body); //json으로 파싱
     
-    let schools = jsonbody.schoolInfo[1]
+    let school = jsonbody.schoolInfo[1]
     let result = [];
-    for(let i = 0; schools.row[i] != undefined; i++){
-        let school_code = jsonbody.schoolInfo[1].row[i].SD_SCHUL_CODE;   //학교 코드
-        let school_name = jsonbody.schoolInfo[1].row[i].SCHUL_NM;     //학교이름
-        let school_location = jsonbody.schoolInfo[1].row[i].LCTN_SC_NM; //학교 위치
-      
+    for(let i = 0; school.row[i] != undefined; i++){
+        if('초등학교' === school.row[i].SCHUL_KND_SC_NM){
+          continue;
+        }
+        let school_code = school.row[i].SD_SCHUL_CODE;   //학교 코드
+        let school_name = school.row[i].SCHUL_NM;     //학교이름
+        let school_location = school.row[i].LCTN_SC_NM; //학교 위치
+        
         result[i] = {
           "school_code" : school_code,
           "school_name" : school_name,
