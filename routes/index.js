@@ -1,8 +1,6 @@
 var express = require('express');
 var router = express.Router();
 let request = require('request');
-let cheerio = require('cheerio');
-const { data } = require('cheerio/lib/api/attributes');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -30,34 +28,23 @@ router.get('/schoolinfo', function(req, res, next) {//학교검색하기
     if(err){
       return res.status(400).json({err});
     }
-    //let bodyJson = JSON.parse(body);
-    //console.log(bodyJson);
-    console.log(typeof(body));
-    let jsonbody = JSON.parse(body);
-    console.log(jsonbody);
+    let jsonbody = JSON.parse(body); //json으로 파싱
     
-      console.log(jsonbody.schoolInfo[1].row[0]);
-    
-  });
-
-  res.status(200).json({});
-  /*res.status(200).json([
-    {
-      school_code:"대충학교코드",
-      school_name:"대고소푸토웨아고등학교",
-      school_location:"대구 구지 구지로 182",
-    },
-    {
-      school_code:"대충학교코드2",
-      school_name:"대고소푸토웨아고등학교2",
-      school_location:"대구 구지 구지로 182+2",
-    },
-    {
-      school_code:"대충학교코드3",
-      school_name:"대고소푸토웨아고등학교3",
-      school_location:"대구 구지 구지로 182+3",
+    let schools = jsonbody.schoolInfo[1]
+    let result = [];
+    for(let i = 0; schools.row[i] != undefined; i++){
+        let school_code = jsonbody.schoolInfo[1].row[i].SD_SCHUL_CODE;   //학교 코드
+        let school_name = jsonbody.schoolInfo[1].row[i].SCHUL_NM;     //학교이름
+        let school_location = jsonbody.schoolInfo[1].row[i].LCTN_SC_NM; //학교 위치
+      
+        result[i] = {
+          "school_code" : school_code,
+          "school_name" : school_name,
+          "school_lacation" : school_location
+       }
     }
-  ])*/
+    res.status(200).json({result});
+  });
 });
 
 module.exports = router;
