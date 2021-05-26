@@ -2,6 +2,9 @@ var express = require('express');
 var router = express.Router();
 const upload = require('../middleware/fileload');
 const db = require('../model/db');
+const jwt = require('jsonwebtoken');
+const secret = require('../secret/primary');
+const crypto = require('crypto');
 /* GET users listing. */
 
 router.get('/:userid', function(req, res, next) {//조회
