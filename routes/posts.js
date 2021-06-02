@@ -154,10 +154,8 @@ router.post('/', upload.array('attachment'), function (req, res, next) {
 router.get('/:postid', function (req, res, next) {
   //게시글 조회
   postid = req.params.postid;
-  db.query(`SELECT post.postid, post.title, tag, post.userid, post.price, post.timestamp, user.nickname, user.schoolname, attachment.url, attachment.attachmentid FROM post
+  db.query(`SELECT post.postid, post.title, tag, post.userid, post.price, post.timestamp, user.nickname, user.schoolname,post.content,user.profilepicture, attachment.url, attachment.attachmentid FROM post
     inner join attachment on post.postid = attachment.postid INNER JOIN user ON user.userid=post.userid where post.postid = ?;`, [postid], (err, result) => {
-      console.log(err);
-      console.log(result);
       if (result == undefined) {
         res.status(401).json();
         return;
