@@ -8,6 +8,10 @@ router.get('/:userid', function (req, res, next) {
       res.status(400).json({ error: err });
       return;
     }
+    if(result[0]==undefined){
+      res.status(403).json({error:"no man"});
+      return;
+    }
     res.status(200).json({
       nickname: result[0].nickname,
       schoolname: result[0].schoolname,
