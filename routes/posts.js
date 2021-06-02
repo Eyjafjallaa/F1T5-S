@@ -221,7 +221,50 @@ router.post('/:postid/req', function (req, res, next) {
   res.status(200).json({});
 });
 
+router.post('/like', function (req, res, next) {
+  const token = req.get('authorization');
+  const postid = req.body.postid;
+  console.log(token);
 
+  const tokendecode = () => {
+    const promise = new Promise((resolve, reject) => {
+      jwt.verify(token, secret, (err, data) => {
+        console.log(data);
+        if (err) reject(err);
+        else resolve(data);
+      })
+    })
+    return promise;
+  }
+
+  const dbLikeSerch = (data) =>{
+    const promise = new Promise((resolve, reject) =>{
+      db.query('insert into like(userid, postid) values(?, ?)', [data.sub, postid], (err, result) =>{
+        if(err) reject(err);
+        if(result == undefined) resolve(false);
+        else resolve(true);
+      })
+    })
+  }
+
+  const respond = (result) => {
+    if(result){
+      res.status(200).json({});
+    }
+    else{
+      res.status(403).json({});
+    }
+  }
+
+  const error = (error) => {
+    res.status(403).json({});
+  }
+
+  tokendecode()
+  .then(dbLikeSerch)
+  .then(respond)
+  .catch(error)
+});
 
 
 module.exports = router;
