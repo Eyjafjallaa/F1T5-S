@@ -32,7 +32,7 @@ router.post('/login', (req, res) => {
   let post = req.body;
   const pw = crypto.createHash('sha512').update(post.password).digest('base64'); //암호화된 리퀘스트 패스워드
   db.query(`select password from user where userid=?`, [post.userid], (err, result) => {
-    if (result[0] == undefined) {
+    if (result == undefined) {
       res.status(401).json();
       return;
     }
