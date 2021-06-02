@@ -165,8 +165,7 @@ router.get('/:postid', function (req, res, next) {
     //console.log(result)
     let attachment = []; //새로운 배열
     for (let i in (result)) { // 배열에 url, id 객체를 추가
-      attachment.push({url : result[i].url,
-      attachmentid : result[i].attachmentid});
+      attachment.push(result[i].url,);
     }
     delete result[0].url;
     delete result[0].attachmentid;
