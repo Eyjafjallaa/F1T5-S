@@ -37,12 +37,13 @@ router.get('/', function (req, res, next) {//sort 하는 방법 추가해야함
       if(req.query.count==null) count=10;
       else count = parseInt(req.query.count);
       
-      db.query(`SELECT post.postid,post.title,post.tag,post.userid,post.price,post.timestamp,user.nickname,
+      db.query(`SELECT post.postid,post.title,post.tag,post.userid,post.price,post.timestamp,user.nickname,user.schoolname,
       group_concat(attachment.url ORDER by attachment.attachmentid) AS URL
       FROM post LEFT JOIN user ON post.userid=user.userid
       LEFT JOIN attachment on attachment.postid=post.postid
       GROUP BY post.postid order by ?
       LIMIT ?,?`,[sorting(), start,count],(err, result) => {
+        console.log(err);
         if (err) reject(err);
         else {
           var arr_result = [];
@@ -55,6 +56,7 @@ router.get('/', function (req, res, next) {//sort 하는 방법 추가해야함
               nickname: result[i].nickname,
               price: result[i].price,
               timestamp: result[i].timestamp,
+              schoolname:result[i].schoolname,
               attachment: result[i].URL,
             });
           }
@@ -152,9 +154,11 @@ router.post('/', upload.array('attachment'), function (req, res, next) {
 router.get('/:postid', function (req, res, next) {
   //게시글 조회
   postid = req.params.postid;
-  db.query(`SELECT post.postid, post.title tag, post.userid, post.price, post.timestamp, attachment.url, attachment.attachmentid FROM post
-    inner join attachment on post.postid = attachment.postid where post.postid = ?;`, [postid], (err, result) => {
-      if (result[0] == undefined) {
+  db.query(`SELECT post.postid, post.title, tag, post.userid, post.price, post.timestamp, user.nickname, user.schoolname, attachment.url, attachment.attachmentid FROM post
+    inner join attachment on post.postid = attachment.postid INNER JOIN user ON user.userid=post.userid where post.postid = ?;`, [postid], (err, result) => {
+      console.log(err);
+      console.log(result);
+      if (result == undefined) {
         res.status(401).json();
         return;
       }
