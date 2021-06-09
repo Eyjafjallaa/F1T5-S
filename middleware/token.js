@@ -5,7 +5,10 @@ const crypto = require('crypto');
 const tokendecode = (req,res,next) => {
     let token = req.get('authorization');
     jwt.verify(token, secret, (err, data) => {
-        if(err) console.log(err);
+        if(err){
+            res.status(401).json({err:err});
+            return;
+        }    
         req.token = data;
     })
     next()

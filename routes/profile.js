@@ -88,7 +88,7 @@ router.get('/',token, function (req, res, next) {//조회
     .catch(error);
 });
 
-router.put('/:userid', decode,upload.single('attachment'), function (req, res, next) {//수정
+router.put('/', decode,upload.single('attachment'), function (req, res, next) {//수정
     const URL = "images/profile/" + req.file.filename;
 
     const token = req.token;
