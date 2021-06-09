@@ -54,9 +54,7 @@ router.get('/',token, function (req, res, next) {//조회
             ORDER BY timestamp DESC
             LIMIT 0,5;
             `,[t.id],(err,result)=>{
-                console.log(t);
                 if(err)reject(err);
-                console.log(result);
                 t.like=result
                 resolve(t);
             })
@@ -136,7 +134,7 @@ router.put('/:userid', decode,upload.single('attachment'), function (req, res, n
     .catch(error)
 });
 
-router.get('/like',(req,res)=>{
+router.get('/like',decode,(req,res)=>{
 
 })
 module.exports = router;
