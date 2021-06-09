@@ -224,7 +224,7 @@ router.post('/:postid/req', function (req, res, next) {
   res.status(200).json({});
 });
 
-router.post('/like', function (req, res, next) {
+router.post('/:postid/like', function (req, res, next) {
   const token = req.get('authorization');
   let postid = req.body.postid;
   postid = parseInt(postid);
