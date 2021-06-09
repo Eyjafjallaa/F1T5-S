@@ -5,25 +5,18 @@ const db = require('../model/db');
 const jwt = require('jsonwebtoken');
 const secret = require('../secret/primary');
 const crypto = require('crypto');
+const token = require('../middleware/token');
+const { decode } = require('querystring');
 /* GET users listing. */
 
-router.get('/', function (req, res, next) {//조회
+router.get('/',token, function (req, res, next) {//조회
     //응답: school_name,name,nickname,contact,enteryear,profilepicture,email
-    const token = req.get('authorization');
+    const token = req.token 
 
-    const tokendecode=()=>{
-        const promise = new Promise((resolve,reject)=>{
-            jwt.verify(token, secret, (err, data) => {
-                if(err)reject(err);
-                else resolve(data);
-            })
-        })
-        return promise;
-    }
     
-    const dbsearch=(data)=>{
+    const dbsearch=()=>{
         const promise = new Promise((resolve,reject)=>{
-            var userid=data.sub;
+            var userid=token.sub;
             db.query('select schoolname, name, nickname, contact, enteryear, profilepicture, email from user where userid = ?',
             [userid], (err, result) => {
                 //객체
@@ -89,33 +82,24 @@ router.get('/', function (req, res, next) {//조회
         res.status(500).json({ error: error });
     }
 
-    tokendecode()
-    .then(dbsearch)
+
+    dbsearch()
     .then(likes)
     .then(substr_URL)
     .then(respond)
     .catch(error);
 });
 
-router.put('/:userid', upload.single('attachment'), function (req, res, next) {//수정
+router.put('/:userid', decode,upload.single('attachment'), function (req, res, next) {//수정
     const URL = "images/profile/" + req.file.filename;
 
-    const token = req.body.token;
-    const tokendecode = () => {
-        const promise = new Promise((resolve, reject) => {
-            jwt.verify(token, secret, (err, data) => {
-                if (err) reject(err);
-                else resolve(data);
-            })
-        })
-        return promise;
-    }
+    const token = req.token;
 
-    const updatePhoto = (data) => {
+    const updatePhoto = () => {
         const promise = new Promise((resolve, reject) => {
-            db.query('UPDATE user SET profilepicture =? WHERE userid = ?', [URL, data.sub], (err, result) => {
+            db.query('UPDATE user SET profilepicture =? WHERE userid = ?', [URL, token.sub], (err, result) => {
                 if (err) reject(err)
-                resolve(data);
+                resolve(token);
             });
         })
         return promise
@@ -146,11 +130,13 @@ router.put('/:userid', upload.single('attachment'), function (req, res, next) {/
     const error = (error) => {
         res.status(500).json({ error: error })
     }
-    tokendecode()
-        .then(updatePhoto)
-        .then(queryUser)
-        .then(respond)
-        .catch(error)
+    updatePhoto()
+    .then(queryUser)
+    .then(respond)
+    .catch(error)
 });
 
+router.get('/like',(req,res)=>{
+
+})
 module.exports = router;
