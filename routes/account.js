@@ -20,7 +20,7 @@ router.post('/sign_up', (req, res, next) => {
         iat: new Date().getTime() / 1000
       };
       var token = jwt.sign(user, secret, {
-        expiresIn: "1m"
+        expiresIn: "1M"
       })
       res.status(200).json({
         logintoken: token,
