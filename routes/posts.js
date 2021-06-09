@@ -226,8 +226,7 @@ router.post('/:postid/req', function (req, res, next) {
 
 router.post('/:postid/like', function (req, res, next) {
   const token = req.get('authorization');
-  let postid = req.body.postid;
-  postid = parseInt(postid);
+  let postid = req.params.postid;
 
   const tokendecode = () => {
     const promise = new Promise((resolve, reject) => {
@@ -235,6 +234,30 @@ router.post('/:postid/like', function (req, res, next) {
         if (err) reject(err);
         else resolve(data);
       })
+    })
+    return promise;
+  }
+
+  const dbLikeSelect = (data) => {
+    const promise = new Promise((reject) => {
+      db.query('SELECT userid, postid FROM f1t6.like WHERE userid = ? and postid = ?', [data.sub, postid], (err, result) => {
+        if(err){
+          reject(err);
+        }
+        console.log(result);
+        if (result == 0) {
+          console.log("없어요");
+          dbLikeInsert(data)
+          .then(resposne)
+          .catch(error);
+        }
+        else{
+          console.log("있어요");
+          dbLikeDelete(data)
+          .then(resposne)
+          .catch(error);
+        }
+      });
     })
     return promise;
   }
@@ -242,53 +265,43 @@ router.post('/:postid/like', function (req, res, next) {
   const dbLikeInsert = (data) =>{
     const promise = new Promise((reject) =>{
       db.query('insert into f1t6.like(userid, postid) values(?, ?)', [data.sub, postid], (err, result) =>{
-        if(err){
+        if(err.length != 0) {
+          console.log(err);
           reject(err);
         }
-        res.status(201).json({});
+        console.log("insert");
+        resolve(err);
       })
     })
+    return promise;
+  }
+
+  const dbLikeDelete = (data) =>{
+    const promise = new Promise((reject) => {
+      db.query('delete from f1t6.like where userid = ? and postid = ?', [data.sub, postid], (err, result) => {  
+        if(err.length != 0) {
+          reject(err);
+        }
+        console.log("delete");
+        resolve(err);
+      })
+    })
+    return promise;
+  }
+
+  const resposne = (err) => {
+    if(err.length == 0){
+      res.status(201).json({});
+    }
+    res.status(403).json({err});
   }
   const error = (error) => {
     res.status(403).json({error});
   }
 
   tokendecode()
-  .then(dbLikeInsert)
+  .then(dbLikeSelect)
   .catch(error)
 });
-
-router.post('/revoke', (req, res, next) => {
-  const token = req.get('authorization');
-  const postid = parseInt(req.body.postid);
-  const tokendecode = () => {
-    const promise = new Promise((resolve, reject) => {
-      jwt.verify(token, secret, (err, data) => {
-        if (err) reject(err);
-        else resolve(data);
-      })
-    })
-    return promise;
-  }
-  const dbLikeDelete = (data) =>{
-    const promise = new Promise((reject) => {
-      db.query('delete from f1t6.like where userid = ? and postid = ?', [data.sub, postid], (err, result) => {
-        if(err){
-          reject(err);
-        }
-        res.status(201).json({});
-      })
-    })
-  }
-
-  const error = (err) =>{
-    res.status(400).json({err});
-  }
-
-  tokendecode()
-  .then(dbLikeDelete)
-  .catch(error)
-});
-
 
 module.exports = router;
