@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const db = require('../model/db');
 const upload = require('../middleware/fileload');
+const decode = require('../middleware/token');
 const secret = require('../secret/primary');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
@@ -70,7 +71,6 @@ router.get('/', function (req, res, next) {//sort 하는 방법 추가해야함
 
   const substr_URL = (result) => {
     const promise = new Promise((resolve, reject) => {
-      var arr_result = [];
       for (var i = 0; i < result.length; i++) {
         if(result[i].attachment==undefined)continue;
         const a=result[i].attachment.split(',');

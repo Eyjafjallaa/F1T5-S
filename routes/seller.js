@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const db = require('../model/db');
-
+var decode = require('../middleware/token');
 router.get('/:userid', function (req, res, next) {
   db.query(`SELECT * FROM user WHERE userid = ?`, [req.params.userid], (err, result) => {
     if (err) {
@@ -15,12 +15,12 @@ router.get('/:userid', function (req, res, next) {
     res.status(200).json({
       nickname: result[0].nickname,
       schoolname: result[0].schoolname,
-      prifilepicture: result[0].profilepicture,
+      profilepicture: result[0].profilepicture,
     });
   })
 });
 
-router.get('/:userid/products', function (req, res, next) {
+router.get('/:sellerid/products',decode, function (req, res, next) {
   const search_post = ()=>{
     var step;
     if(req.query.step=="0"){
@@ -36,7 +36,9 @@ router.get('/:userid/products', function (req, res, next) {
       WHERE user.userid=? AND post.step=?
       GROUP BY post.postid 
       ORDER BY timestamp DESC
-      `,[req.params.userid,step],(err,result)=>{
+      `,[req.params.sellerid,step],(err,result)=>{
+        console.log(result)
+        console.log(req.params.sellerid+step);
         if(err)reject(err);
         else{
           var arr_result=[];
@@ -80,10 +82,11 @@ router.get('/:userid/products', function (req, res, next) {
     res.status(500).json({ error: error });
   }
 
+
   search_post()
-    .then(substr_URL)
-    .then(respond)
-    .catch(error);
+  .then(substr_URL)
+  .then(respond)
+  .catch(error);
 });
 
 
