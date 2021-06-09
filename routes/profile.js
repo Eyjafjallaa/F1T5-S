@@ -5,7 +5,6 @@ const db = require('../model/db');
 const jwt = require('jsonwebtoken');
 const secret = require('../secret/primary');
 const crypto = require('crypto');
-const { resolve } = require('path');
 /* GET users listing. */
 
 router.get('/', function (req, res, next) {//조회
