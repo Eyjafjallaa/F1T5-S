@@ -6,13 +6,12 @@ const jwt = require('jsonwebtoken');
 const secret = require('../secret/primary');
 const crypto = require('crypto');
 const token = require('../middleware/token');
-const { decode } = require('querystring');
+
 /* GET users listing. */
 
 router.get('/',token, function (req, res, next) {//조회
     //응답: school_name,name,nickname,contact,enteryear,profilepicture,email
     const token = req.token 
-
     
     const dbsearch=()=>{
         const promise = new Promise((resolve,reject)=>{
@@ -53,7 +52,7 @@ router.get('/',token, function (req, res, next) {//조회
             GROUP BY post.postid
             ORDER BY timestamp DESC
             LIMIT 0,5;
-            `,[t.id],(err,result)=>{
+            `,[t.userid],(err,result)=>{
                 if(err)reject(err);
                 t.like=result
                 resolve(t);
@@ -88,7 +87,7 @@ router.get('/',token, function (req, res, next) {//조회
     .catch(error);
 });
 
-router.put('/', decode,upload.single('attachment'), function (req, res, next) {//수정
+router.put('/', token,upload.single('attachment'), function (req, res, next) {//수정
     const URL = "images/profile/" + req.file.filename;
 
     const token = req.token;
@@ -134,7 +133,7 @@ router.put('/', decode,upload.single('attachment'), function (req, res, next) {/
     .catch(error)
 });
 
-router.get('/like',decode,(req,res)=>{
+router.get('/like', token, function(req,res,next){
     const likes=()=>{
         const promise=new Promise((resolve,reject)=>{
             db.query(`SELECT post.postid,post.title,post.price,
@@ -152,7 +151,7 @@ router.get('/like',decode,(req,res)=>{
         })
         return promise;
     }
-
+    
     const substr_URL = (result) => {
         const promise = new Promise((resolve, reject) => {
             for (var i = 0; i < result.length; i++) {
