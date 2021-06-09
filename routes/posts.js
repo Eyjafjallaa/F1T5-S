@@ -96,20 +96,12 @@ router.get('/', function (req, res, next) {//sort 하는 방법 추가해야함
 });
 
 
-router.post('/', upload.array('attachment'), function (req, res, next) {
+router.post('/',decode,upload.array('attachment'), function (req, res, next) {
   var post = req.body;
-  const token = req.body.token;
-  const tokendecode = () => {
-    const promise = new Promise((resolve, reject) => {
-      jwt.verify(token, secret, (err, data) => {
-        if (err) reject(err);
-        else resolve(data);
-      })
-    })
-    return promise;
-  }
+  const token = req.token;
+  
   const querypost = (data) => {
-    var userid=data.sub;
+    var userid=token.sub;
     const promise = new Promise((resolve, reject) => {
       db.beginTransaction();
       db.query('INSERT INTO post (title,tag,userid,step,price,content,timestamp) VALUES(?,?,?,?,?,?,NOW()) ',
@@ -144,8 +136,7 @@ router.post('/', upload.array('attachment'), function (req, res, next) {
     res.status(500).json({ error: error });
   }
   
-  tokendecode()
-  .then(querypost)
+  querypost()
   .then(picturequery)
   .then(respond)
   .catch(error)
@@ -224,84 +215,68 @@ router.post('/:postid/req', function (req, res, next) {
   res.status(200).json({});
 });
 
-router.post('/:postid/like', function (req, res, next) {
-  const token = req.get('authorization');
+router.post('/:postid/like', decode, function (req, res, next) {
+  
+  const userid = req.token.sub;
+
   let postid = req.params.postid;
 
-  const tokendecode = () => {
-    const promise = new Promise((resolve, reject) => {
-      jwt.verify(token, secret, (err, data) => {
-        if (err) reject(err);
-        else resolve(data);
-      })
-    })
-    return promise;
-  }
-
-  const dbLikeSelect = (data) => {
+  const dbLikeSelect = () => {
     const promise = new Promise((reject) => {
-      db.query('SELECT userid, postid FROM f1t6.like WHERE userid = ? and postid = ?', [data.sub, postid], (err, result) => {
+      db.query('SELECT userid, postid FROM f1t6.like WHERE userid = ? and postid = ?', [userid, postid], (err, result) => {
         if(err){
           reject(err);
         }
-        console.log(result);
-        if (result == 0) {
-          console.log("없어요");
-          dbLikeInsert(data)
+        if (result === undefined || result.length ==0) {
+          dbLikeInsert()
           .then(resposne)
-          .catch(error);
+          .catch((err) => {
+            res.status(403).json({err});
+          });
         }
         else{
-          console.log("있어요");
-          dbLikeDelete(data)
+          dbLikeDelete()
           .then(resposne)
-          .catch(error);
+          .catch((err) => {
+            res.status(403).json({err});
+          });
         }
       });
     })
     return promise;
   }
 
-  const dbLikeInsert = (data) =>{
-    const promise = new Promise((reject) =>{
-      db.query('insert into f1t6.like(userid, postid) values(?, ?)', [data.sub, postid], (err, result) =>{
-        if(err.length != 0) {
-          console.log(err);
+  const dbLikeInsert = () =>{
+    const promise = new Promise((resolve, reject) =>{
+      db.query('insert into f1t6.like (userid, postid) values(?, ?)', [userid, postid], (err, result) =>{
+        if(err) {
           reject(err);
         }
-        console.log("insert");
-        resolve(err);
+        resolve();
       })
     })
     return promise;
   }
 
-  const dbLikeDelete = (data) =>{
-    const promise = new Promise((reject) => {
-      db.query('delete from f1t6.like where userid = ? and postid = ?', [data.sub, postid], (err, result) => {  
-        if(err.length != 0) {
+  const dbLikeDelete = () =>{
+    const promise = new Promise((resolve,reject) => {
+      db.query('delete from f1t6.like where userid = ? and postid = ?', [userid, postid], (err, result) => { 
+        if(err) {
           reject(err);
         }
-        console.log("delete");
-        resolve(err);
+        resolve();
       })
     })
     return promise;
   }
 
-  const resposne = (err) => {
-    if(err.length == 0){
+  const resposne = () => {
+    const promise = new Promise((resolve, reject) => {
       res.status(201).json({});
-    }
-    res.status(403).json({err});
-  }
-  const error = (error) => {
-    res.status(403).json({error});
+    })
   }
 
-  tokendecode()
-  .then(dbLikeSelect)
-  .catch(error)
+  dbLikeSelect();
 });
 
 module.exports = router;
