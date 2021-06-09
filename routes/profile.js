@@ -135,6 +135,47 @@ router.put('/:userid', decode,upload.single('attachment'), function (req, res, n
 });
 
 router.get('/like',decode,(req,res)=>{
+    const likes=()=>{
+        const promise=new Promise((resolve,reject)=>{
+            db.query(`SELECT post.postid,post.title,post.price,
+            group_concat(attachment.url ORDER by attachment.attachmentid) AS attachment
+            FROM post 
+            LEFT JOIN f1t6.like ON post.userid=f1t6.like.postid
+            LEFT JOIN attachment ON attachment.postid=post.postid 
+            WHERE post.userid =?
+            GROUP BY post.postid
+            ORDER BY timestamp DESC
+            `,[req.token.sub],(err,result)=>{
+                if(err)reject(err);
+                resolve(result);
+            })
+        })
+        return promise;
+    }
 
+    const substr_URL = (result) => {
+        const promise = new Promise((resolve, reject) => {
+            for (var i = 0; i < result.length; i++) {
+                if (result[i].attachment == undefined) continue;
+                const a = result[i].attachment.split(',');
+                result[i].attachment = a;
+            }
+            resolve(result);
+        })
+        return promise;
+    }
+    
+    const respond = (result) => {
+        res.status(200).json(result);
+    }
+    
+    const error = (error) => {
+        res.status(500).json({ error: error });
+    }
+
+    likes()
+    .then(substr_URL)
+    .then(respond)
+    .catch(error);
 })
 module.exports = router;
