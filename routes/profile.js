@@ -102,6 +102,16 @@ router.get('/',token, function (req, res, next) {//조회
                 const a = result.like[i].attachment.split(',');
                 result.like[i].attachment = a;
             }
+            for (var i = 0; i < result.selling.length; i++) {
+                if (result.selling[i].attachment == undefined) continue;
+                const a = result.selling[i].attachment.split(',');
+                result.selling[i].attachment = a;
+            }
+            for (var i = 0; i < result.sold.length; i++) {
+                if (result.sold[i].attachment == undefined) continue;
+                const a = result.sold[i].attachment.split(',');
+                result.sold[i].attachment = a;
+            }
             resolve(result);
         })
         return promise;
@@ -138,6 +148,18 @@ router.put('/', token,upload.single('attachment'), function (req, res, next) {//
         return promise
     }
 
+    const udpateData=()=>{
+        const promise = new Promise((resolve,reject)=>{
+            const pw = crypto.createHash('sha512').update(req.body.password).digest('base64');
+            db.query('UPDATE user SET nickname = ?, email = ?, schoolname =?, password = ? WHERE userid =?',
+            [req.body.nickname,req.body.email,req.body.schoolname,pw,token.sub],(err,result)=>{
+                if(err)reject(err);
+                resolve(token);
+            })
+        })
+        return promise;
+    }
+
     const queryUser = (data) => {
         const promise = new Promise((resolve, reject) => {
             db.query('SELECT schoolname,name,nickname,contact,enteryear,profilepicture,email FROM user WHERE userid=?', [data.sub], (err, result) => {
@@ -164,6 +186,7 @@ router.put('/', token,upload.single('attachment'), function (req, res, next) {//
         res.status(500).json({ error: error })
     }
     updatePhoto()
+    .then(udpateData)
     .then(queryUser)
     .then(respond)
     .catch(error)
