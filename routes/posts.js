@@ -9,8 +9,8 @@ const crypto = require('crypto');
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {//sort 하는 방법 추가해야함
-  const sorting=()=>{
-    var c="";
+  const sorting=(t)=>{
+    var c=t;
     switch(req.query.sort){
       case "1":
         c+="timestamp DESC";
@@ -28,6 +28,7 @@ router.get('/', function (req, res, next) {//sort 하는 방법 추가해야함
         c+="timestamp DESC";
         break;
     }
+    c+=" LIMIT ?,?"
     return c;
   }
   const search_post = () => {
@@ -39,12 +40,12 @@ router.get('/', function (req, res, next) {//sort 하는 방법 추가해야함
       if(req.query.count==null) count=10;
       else count = parseInt(req.query.count);
       
-      db.query(`SELECT post.postid,post.title,post.tag,post.userid,post.price,post.timestamp,user.nickname,user.schoolname,
+      db.query(sorting(`SELECT post.postid,post.title,post.tag,post.userid,post.price,post.timestamp,user.nickname,user.schoolname,
       group_concat(attachment.url ORDER by attachment.attachmentid) AS URL
       FROM post LEFT JOIN user ON post.userid=user.userid
       LEFT JOIN attachment on attachment.postid=post.postid
-      GROUP BY post.postid order by ?
-      LIMIT ?,?`,[sorting(), start,count],(err, result) => {
+      GROUP BY post.postid order by 
+      `),[ start,count],(err, result) => {
         if (err) reject(err);
         else {
           var arr_result = [];
