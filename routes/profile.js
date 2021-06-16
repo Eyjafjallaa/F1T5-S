@@ -78,7 +78,7 @@ router.get('/',token, function (req, res, next) {//조회
         return promise;
     }
 
-    const selled=(t)=>{
+    const sold=(t)=>{
         const promise = new Promise((resolve,reject)=>{
             db.query(`SELECT post.postid,post.title,post.price,
             group_concat(attachment.url ORDER by attachment.attachmentid) AS attachment
@@ -88,7 +88,7 @@ router.get('/',token, function (req, res, next) {//조회
             ORDER BY timestamp DESC
             LIMIT 0,5`,[t.userid],(err,result)=>{
                 if(err)reject(err);
-                t.selled=result;
+                t.sold=result;
                 resolve(t);
             })
         })
@@ -117,7 +117,7 @@ router.get('/',token, function (req, res, next) {//조회
     dbsearch()
     .then(likes)
     .then(selling)
-    .then(selled)
+    .then(sold)
     .then(substr_URL)
     .then(respond)
     .catch(error);
