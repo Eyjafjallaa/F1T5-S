@@ -45,7 +45,7 @@ router.get('/', function (req, res, next) {//sort 하는 방법 추가해야함
       FROM post LEFT JOIN user ON post.userid=user.userid
       LEFT JOIN attachment on attachment.postid=post.postid
       GROUP BY post.postid order by 
-      `),[ start,count],(err, result) => {
+      `),[start,count],(err, result) => {
         if (err) reject(err);
         else {
           var arr_result = [];
@@ -279,4 +279,15 @@ router.post('/:postid/like', decode, function (req, res, next) {
   dbLikeSelect();
 });
 
+
+router.put('/:postid/step',decode,(req,res,next)=>{
+  db.query('UPDATE post SET step = 1 WHERE postid = ?',[req.params.postid],(err,result)=>{
+    if(err){
+    console.log(err);
+    res.status(200).json({err:err});
+    return;
+    }
+    res.status(200).json({});
+  })
+})
 module.exports = router;

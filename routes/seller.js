@@ -37,8 +37,8 @@ router.get('/:sellerid/products',decode, function (req, res, next) {
       GROUP BY post.postid 
       ORDER BY timestamp DESC
       `,[req.params.sellerid,step],(err,result)=>{
-        console.log(result)
-        console.log(req.params.sellerid+step);
+        //console.log(result)
+        //console.log(req.params.sellerid+step);
         if(err)reject(err);
         else{
           var arr_result=[];

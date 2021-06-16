@@ -137,7 +137,6 @@ router.put('/', token,upload.single('attachment'), function (req, res, next) {//
     const URL = "images/profile/" + req.file.filename;
 
     const token = req.token;
-
     const updatePhoto = () => {
         const promise = new Promise((resolve, reject) => {
             db.query('UPDATE user SET profilepicture =? WHERE userid = ?', [URL, token.sub], (err, result) => {
