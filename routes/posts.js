@@ -45,7 +45,6 @@ router.get('/', function (req, res, next) {//sort 하는 방법 추가해야함
       LEFT JOIN attachment on attachment.postid=post.postid
       GROUP BY post.postid order by ?
       LIMIT ?,?`,[sorting(), start,count],(err, result) => {
-        console.log(err);
         if (err) reject(err);
         else {
           var arr_result = [];

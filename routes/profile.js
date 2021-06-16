@@ -61,6 +61,40 @@ router.get('/',token, function (req, res, next) {//조회
         return promise
     }
 
+    const selling=(t)=>{
+        const promise = new Promise((resolve,reject)=>{
+            db.query(`SELECT post.postid,post.title,post.price,
+            group_concat(attachment.url ORDER by attachment.attachmentid) AS attachment
+            FROM post LEFT JOIN attachment ON attachment.postid=post.postid 
+            WHERE post.userid =? AND post.step=0
+            GROUP BY post.postid
+            ORDER BY timestamp DESC
+            LIMIT 0,5`,[t.userid],(err,result)=>{
+                if(err)reject(err);
+                t.selling=result;
+                resolve(t);
+            })
+        })
+        return promise;
+    }
+
+    const selled=(t)=>{
+        const promise = new Promise((resolve,reject)=>{
+            db.query(`SELECT post.postid,post.title,post.price,
+            group_concat(attachment.url ORDER by attachment.attachmentid) AS attachment
+            FROM post LEFT JOIN attachment ON attachment.postid=post.postid 
+            WHERE post.userid =? AND post.step=1
+            GROUP BY post.postid
+            ORDER BY timestamp DESC
+            LIMIT 0,5`,[t.userid],(err,result)=>{
+                if(err)reject(err);
+                t.selled=result;
+                resolve(t);
+            })
+        })
+        return promise;
+    }
+
     const substr_URL = (result) => {
         const promise = new Promise((resolve, reject) => {
             for (var i = 0; i < result.like.length; i++) {
@@ -82,6 +116,8 @@ router.get('/',token, function (req, res, next) {//조회
 
     dbsearch()
     .then(likes)
+    .then(selling)
+    .then(selled)
     .then(substr_URL)
     .then(respond)
     .catch(error);
